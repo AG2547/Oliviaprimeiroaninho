@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmação de Presença - Olívia 1 Ano</title>
+    <!-- Fonte fofa combinando com o tema infantil -->
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Baloo 2', cursive;
+            /* Usando a imagem exata que você enviou */
+            background-image: url('image_9cc01e.jpg'); 
+            background-size: cover;
+            background-position: center top;
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; /* Joga o formulário para baixo para não tampar o letreiro da Olívia */
+            align-items: center;
+            min-height: 100vh;
+            color: #5a4b53;
+            padding-bottom: 5vh;
+        }
+
+        /* Máscara em degradê: transparente em cima (para ver a arte) e clara embaixo (para ler o form) */
+        .overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 40%, rgba(255,255,255,0.95) 100%);
+            z-index: 1;
+        }
+
+        .quiz-container {
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 25px;
+            padding: 30px 25px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border: 3px solid #f48fb1; /* Rosa inspirado nas flores da imagem */
+            margin-top: 180px; /* Dá um respiro pro nome da Olívia no topo */
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            color: #d81b60; /* Rosa mais escuro para destaque */
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+        
+        .small-text {
+            font-size: 0.9rem;
+            color: #d32f2f;
+            display: block;
+            margin-top: -10px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 15px;
+            border: 2px solid #a2c8df; /* Azul nuvem */
+            font-size: 1.1rem;
+            font-family: 'Baloo 2', cursive;
+            text-align: center;
+            outline: none;
+            margin-bottom: 15px;
+            color: #2d3436;
+        }
+
+        input:focus {
+            border-color: #f48fb1;
+            box-shadow: 0 0 8px rgba(244, 143, 177, 0.4);
+        }
+
+        .btn {
+            background-color: #f48fb1;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1.2rem;
+            font-family: 'Baloo 2', cursive;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+            width: 100%;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            background-color: #d81b60;
+            transform: scale(1.03);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid #f48fb1;
+            color: #d81b60;
+        }
+
+        .btn-outline:hover {
+            background-color: #f48fb1;
+            color: white;
+        }
+
+        /* Lógica para esconder e mostrar os passos */
+        .step {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #eee;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #a2c8df;
+            width: 25%;
+            transition: width 0.4s ease;
+        }
+        
+        #companion-qtd-section {
+            display: none;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="overlay"></div>
+
+    <div class="quiz-container">
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+
+        <!-- PASSO 1: Nome -->
+        <div id="step1" class="step active">
+            <h1>Oi! Que alegria! 🌸</h1>
+            <p>Para começarmos a confirmar sua presença no 1º aninho da Olívia, qual é o seu nome?</p>
+            <input type="text" id="guestName" placeholder="Seu nome completo" required>
+            <button class="btn" onclick="goToStep2()">Continuar 🐑</button>
+        </div>
+
+        <!-- PASSO 2: Acompanhantes (Sim/Não) -->
+        <div id="step2" class="step">
+            <h1>Acompanhantes 👨‍👩‍👧‍👦</h1>
+            <p><span id="displayName"></span>, você levará acompanhante(s) adulto(s)?</p>
+            
+            <div id="companion-question">
+                <button class="btn" onclick="showCompanionInput()">Sim, levarei</button>
+                <button class="btn btn-outline" onclick="goToStep3(false)">Não, irei sozinho(a)</button>
+            </div>
+
+            <div id="companion-qtd-section">
+                <p>Quantos acompanhantes adultos irão com você?</p>
+                <input type="number" id="companionCount" placeholder="Ex: 1" min="1" max="10">
+                <button class="btn" onclick="goToStep3(true)">Próximo Passo ➡️</button>
+            </div>
+        </div>
+
+        <!-- PASSO 3: Crianças (Limite de 2) -->
+        <div id="step3" class="step">
+            <h1>Crianças 🎈</h1>
+            <p>E quantas crianças irão com você?</p>
+            <span class="small-text">⚠️ Atenção: Limite de até 2 crianças por convite.</span>
+            <input type="number" id="childCount" placeholder="Ex: 1 (Máximo 2)" min="0" max="2">
+            <button class="btn" onclick="finishQuiz()">Confirmar Presença ✅</button>
+        </div>
+
+        <!-- PASSO FINAL: Sucesso -->
+        <div id="step4" class="step">
+            <h1>Tudo Certo! 🎉</h1>
+            <p>Sua presença foi registrada com sucesso.</p>
+            <p>Mal podemos esperar para comemorar esse dia inesquecível com vocês!</p>
+            <p style="font-size: 2.5rem;">🌸🐑💖</p>
+            
+            <!-- Botão do WhatsApp Integrado -->
+            <button class="btn" onclick="sendWhatsApp()" style="margin-top: 15px; background-color: #25D366; border-color: #25D366; color: white;">
+                Enviar p/ WhatsApp do Anfitrião
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        let userData = {
+            name: '',
+            companions: 0,
+            children: 0
+        };
+
+        function goToStep2() {
+            const nameInput = document.getElementById('guestName').value;
+            if(nameInput.trim() === '') {
+                alert('Por favor, nos diga o seu nome para continuar!');
+                return;
+            }
+            userData.name = nameInput;
+            document.getElementById('displayName').innerText = userData.name.split(' ')[0]; // Pega o primeiro nome
+            document.getElementById('progress').style.width = '50%';
+            switchStep(1, 2);
+        }
+
+        function showCompanionInput() {
+            document.getElementById('companion-question').style.display = 'none';
+            document.getElementById('companion-qtd-section').style.display = 'block';
+        }
+
+        function goToStep3(hasCompanions) {
+            if(hasCompanions) {
+                const compInput = document.getElementById('companionCount').value;
+                if(compInput === '' || compInput < 1) {
+                    alert('Por favor, informe a quantidade de acompanhantes.');
+                    return;
+                }
+                userData.companions = parseInt(compInput);
+            } else {
+                userData.companions = 0;
+            }
+            document.getElementById('progress').style.width = '75%';
+            switchStep(2, 3);
+        }
+
+        function finishQuiz() {
+            const childInput = document.getElementById('childCount').value;
+            let childrenQtd = childInput === '' ? 0 : parseInt(childInput);
+            
+            // Trava de limite de 2 crianças
+            if(childrenQtd > 2) {
+                alert('O limite é de 2 crianças por convite. Por favor, ajuste a quantidade para continuar.');
+                return;
+            }
+            if(childrenQtd < 0) childrenQtd = 0;
+
+            userData.children = childrenQtd;
+            document.getElementById('progress').style.width = '100%';
+            switchStep(3, 4);
+        }
+
+        function switchStep(from, to) {
+            document.getElementById('step' + from).classList.remove('active');
+            document.getElementById('step' + to).classList.add('active');
+        }
+
+        function sendWhatsApp() {
+            // Edite o número abaixo colocando o DDD e o seu telefone
+            const telefone = "5511999999999"; 
+            const totalAdultos = userData.companions + 1; // Quantidade de acompanhantes + o titular
+            
+            const texto = `Olá! Estou confirmando presença no 1º aninho da Olívia!%0A%0A*Nome:* ${userData.name}%0A*Total de Adultos:* ${totalAdultos} (${userData.companions} acompanhante/s)%0A*Crianças:* ${userData.children}`;
+            window.open(`https://wa.me/${telefone}?text=${texto}`, '_blank');
+        }
+    </script>
+
+</body>
+</html>
