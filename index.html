@@ -15,25 +15,19 @@
 
         body {
             font-family: 'Baloo 2', cursive;
-            /* Link da imagem hospedada inserido abaixo */
             background-image: url('https://i.ibb.co/xKh8hFsP/image-9cc01e-jpg.png'); 
             background-size: cover;
             background-position: center top;
             background-attachment: fixed;
             display: flex;
-            justify-content: center; /* Centraliza horizontalmente */
-            align-items: center;     /* Centraliza verticalmente */
+            justify-content: center;
+            align-items: center;
             min-height: 100vh;
             color: #5a4b53;
-            padding: 20px; /* Garante que não encoste nas bordas no mobile */
+            padding: 20px;
         }
 
-        .overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.5) 30%, rgba(255,255,255,0.95) 100%);
-            z-index: 1;
-        }
+        /* O filtro esbranquiçado (.overlay) foi completamente removido daqui */
 
         .quiz-container {
             position: relative;
@@ -41,12 +35,12 @@
             background: rgba(255, 255, 255, 0.95);
             border-radius: 25px;
             padding: 30px 20px;
-            width: 100%; /* Adapta 100% da tela disponível */
-            max-width: 400px; /* Trava o crescimento em telas grandes */
+            width: 100%;
+            max-width: 400px;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25); /* Sombra levemente reforçada para destacar o container no fundo nítido */
             border: 3px solid #f48fb1;
-            margin-top: 15vh; /* Empurra levemente para baixo para não tampar a arte do topo */
+            margin-top: 15vh;
         }
 
         h1 {
@@ -82,7 +76,7 @@
             outline: none;
             margin-bottom: 15px;
             color: #2d3436;
-            -webkit-appearance: none; /* Melhora renderização no iOS */
+            -webkit-appearance: none;
         }
 
         input:focus {
@@ -103,7 +97,7 @@
             width: 100%;
             margin-bottom: 10px;
             font-weight: 600;
-            touch-action: manipulation; /* Evita zoom em duplo clique no mobile */
+            touch-action: manipulation;
         }
 
         .btn:hover, .btn:active {
@@ -160,8 +154,6 @@
 </head>
 <body>
 
-    <div class="overlay"></div>
-
     <div class="quiz-container">
         
         <div class="progress-bar">
@@ -196,7 +188,7 @@
             <p>E quantas crianças irão com você?</p>
             <span class="small-text">⚠️ Atenção: Limite de até 2 crianças por convite.</span>
             <input type="number" id="childCount" placeholder="Ex: 1 (Máximo 2)" min="0" max="2" inputmode="numeric">
-            <button class="btn" onclick="finishQuiz()">Confirmar Presença ✅</button>
+            <button class="btn" id="btn-submit" onclick="finishQuiz()">Confirmar Presença ✅</button>
         </div>
 
         <div id="step4" class="step">
@@ -204,15 +196,14 @@
             <p>Sua presença foi registrada com sucesso.</p>
             <p>Mal podemos esperar para comemorar esse dia inesquecível com vocês!</p>
             <p style="font-size: 2.2rem; margin: 10px 0;">🌸🐑💖</p>
-            
-            <button class="btn" onclick="sendWhatsApp()" style="background-color: #25D366; border-color: #25D366; color: white;">
-                Enviar p/ WhatsApp do Anfitrião
-            </button>
         </div>
 
     </div>
 
     <script>
+        // COLOQUE AQUI A URL DO SEU WEBHOOK/APPS SCRIPT (Passo 2)
+        const WEBHOOK_URL = 'SUA_URL_AQUI'; 
+
         let userData = {
             name: '',
             companions: 0,
@@ -262,22 +253,38 @@
             if(childrenQtd < 0) childrenQtd = 0;
 
             userData.children = childrenQtd;
-            document.getElementById('progress').style.width = '100%';
-            switchStep(3, 4);
+            
+            // Alterar o texto do botão para indicar processamento
+            const btnSubmit = document.getElementById('btn-submit');
+            btnSubmit.innerText = 'Enviando... ⏳';
+            btnSubmit.disabled = true;
+
+            const totalAdultos = userData.companions + 1;
+
+            // Montar o payload
+            let formData = new FormData();
+            formData.append('nome', userData.name);
+            formData.append('adultos', totalAdultos);
+            formData.append('criancas', userData.children);
+
+            // Disparar requisição para a planilha
+            fetch(WEBHOOK_URL, {
+                method: 'POST',
+                body: formData,
+                mode: 'no-cors' // Impede bloqueio de Cross-Origin (CORS) no navegador
+            }).then(() => {
+                document.getElementById('progress').style.width = '100%';
+                switchStep(3, 4);
+            }).catch(error => {
+                console.error('Erro de envio:', error);
+                document.getElementById('progress').style.width = '100%';
+                switchStep(3, 4); // Vai para tela de sucesso mesmo assim para não frustrar o usuário
+            });
         }
 
         function switchStep(from, to) {
             document.getElementById('step' + from).classList.remove('active');
             document.getElementById('step' + to).classList.add('active');
-        }
-
-        function sendWhatsApp() {
-            // Edite o número abaixo colocando o DDD e o seu telefone
-            const telefone = "5511999999999"; 
-            const totalAdultos = userData.companions + 1;
-            
-            const texto = `Olá! Estou confirmando presença no 1º aninho da Olívia!%0A%0A*Nome:* ${userData.name}%0A*Total de Adultos:* ${totalAdultos} (${userData.companions} acompanhante/s)%0A*Crianças:* ${userData.children}`;
-            window.open(`https://wa.me/${telefone}?text=${texto}`, '_blank');
         }
     </script>
 
